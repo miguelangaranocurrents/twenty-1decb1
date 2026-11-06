@@ -1,3 +1,4 @@
+import { isNonEmptyString } from '@sniptt/guards';
 import { useCallback } from 'react';
 import { useStore } from 'jotai';
 
@@ -52,13 +53,20 @@ export const useUpdateViewFromCurrentState = () => {
       return;
     }
 
+    const viewPickerReferenceViewId = store.get(
+      viewPickerReferenceViewIdCallbackState,
+    );
+
+    // Callers outside the view picker (e.g. Options dropdown) may trigger this
+    // with no reference view; there is nothing to update then.
+    if (!isNonEmptyString(viewPickerReferenceViewId)) {
+      return;
+    }
+
     store.set(viewPickerIsPersistingCallbackState, true);
     store.set(viewPickerIsDirtyCallbackState, false);
     store.set(viewPickerModeCallbackState, 'list');
 
-    const viewPickerReferenceViewId = store.get(
-      viewPickerReferenceViewIdCallbackState,
-    );
     const viewPickerInputName = store.get(viewPickerInputNameCallbackState);
     const viewPickerSelectedIcon = store.get(
       viewPickerSelectedIconCallbackState,
